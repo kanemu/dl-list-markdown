@@ -1,0 +1,63 @@
+{
+    "name": "markdown-it-dl-list",
+    "version": "0.1.0",
+    "description": "markdown-it plugin for colon-based definition lists (<dl>, <dt>, <dd>)",
+    "license": "MIT",
+    "type": "module",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/kanemu/dl-list-markdown"
+    },
+    "homepage": "https://github.com/kanemu/dl-list-markdown/tree/main/packages/markdown-it-dl-list",
+    "bugs": {
+        "url": "https://github.com/kanemu/dl-list-markdown/issues"
+    },
+    "keywords": [
+        "markdown-it",
+        "markdown",
+        "definition-list",
+        "dl",
+        "dt",
+        "dd",
+        "plugin"
+    ],
+    "exports": {
+        ".": {
+            "types": "./dist/index.d.ts",
+            "import": "./dist/index.js",
+            "require": "./dist/index.cjs"
+        }
+    },
+    "main": "./dist/index.cjs",
+    "module": "./dist/index.js",
+    "types": "./dist/index.d.ts",
+    "files": [
+        "dist/**",
+        "README.md",
+        "README-ja.md",
+        "LICENSE"
+    ],
+    "sideEffects": false,
+    "scripts": {
+        "build": "tsup src/index.ts --format esm,cjs --dts --clean",
+        "test": "vitest run",
+        "dev": "vitest",
+        "clean": "rimraf dist"
+    },
+    "peerDependencies": {
+        "markdown-it": "^14.0.0"
+    },
+    "peerDependenciesMeta": {
+        "markdown-it": {
+            "optional": false
+        }
+    },
+    "devDependencies": {
+        "@types/markdown-it": "^14.1.2",
+        "markdown-it": "^14.1.0",
+        "rimraf": "^6.1.2",
+        "tsup": "^8.5.1",
+        "typescript": "^5.9.3",
+        "vitest": "^4.0.17"
+    }
+}

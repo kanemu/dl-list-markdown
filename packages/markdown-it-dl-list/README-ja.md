@@ -1,0 +1,133 @@
+# markdown-it-dl-list
+
+`<dl>`, `<dt>`, `<dd>` を使った
+**コロン記法の定義リスト**をサポートする **markdown-it プラグイン**です。
+
+Pandoc などに見られる定義リスト構文に着想を得た、
+シンプルで読みやすい記法を markdown-it で利用できます。
+
+## 特徴
+
+- コロン（`:`）による定義リスト構文
+- `<dl>`, `<dt>`, `<dd>` を生成
+- 1つの用語に複数の定義を記述可能
+- 定義を持たない用語（dt-only）に対応
+- 入れ子の定義リストをサポート
+- 標準的な markdown-it の処理フローに統合可能
+
+## インストール
+
+```bash
+npm install markdown-it-dl-list
+```
+
+## 使い方
+
+```js
+import MarkdownIt from "markdown-it";
+import dlList from "markdown-it-dl-list";
+
+const md = new MarkdownIt();
+md.use(dlList);
+
+const src = `
+: 用語
+    : 説明文その1
+    : 説明文その2
+`;
+
+console.log(md.render(src));
+```
+
+出力結果：
+
+```html
+<dl>
+  <dt>用語</dt>
+  <dd>説明文その1</dd>
+  <dd>説明文その2</dd>
+</dl>
+```
+
+## 構文
+
+### 基本形
+
+```markdown
+: 用語
+    : 説明文
+```
+
+### 複数の定義
+
+```markdown
+: 用語
+    : 説明文その1
+    : 説明文その2
+```
+
+### 定義を持たない用語（dt-only）
+
+定義を持たない用語は、
+**直後が空行またはファイル末尾の場合のみ**有効です。
+
+```markdown
+: 用語のみ
+
+次の行
+```
+
+### 複数行の用語（dt 継続行）
+
+用語行の直後にインデントされた行が続く場合、
+それらは同じ用語として扱われます。
+
+```markdown
+: これは複数行の
+  用語です。
+    : これは複数行の
+      説明文です。
+```
+
+### 入れ子の定義リスト
+
+```markdown
+: 外側の用語
+    : : 内側の用語
+          : 内側の説明文
+    : 次の説明文
+```
+
+## オプション
+
+```ts
+type DlListOptions = {
+  /** dd 行に必要なインデント（スペース数）。デフォルト: 4 */
+  ddIndent?: number;
+
+  /** 定義（dd）を必須とするかどうか。デフォルト: true */
+  requireDd?: boolean;
+
+  /** 空行で現在の定義リストを終了するか。デフォルト: true */
+  breakOnBlankLine?: boolean;
+};
+```
+
+使用例：
+
+```js
+md.use(dlList, {
+  ddIndent: 2,
+  requireDd: true,
+});
+```
+
+## このプラグインが「しないこと」
+
+* 定義リスト以外の Markdown の挙動は変更しません
+* markdown-it の標準的な段落処理は維持されます
+* すべての既存定義リスト構文を網羅することは目的としていません
+
+## ライセンス
+
+MIT

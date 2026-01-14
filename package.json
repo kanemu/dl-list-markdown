@@ -1,0 +1,16 @@
+{
+  "name": "dl-list-markdown",
+  "type": "module",
+  "private": true,
+  "packageManager": "pnpm@10.27.0",
+  "scripts": {
+    "build": "pnpm -r --if-present build",
+    "test": "pnpm -r --if-present test",
+    "clean": "pnpm -r --if-present clean",
+    "lint": "pnpm -r --if-present lint"
+  },
+  "devDependencies": {
+    "markdown-it-dl-list": "workspace:*",
+    "markdown-it": "^14.1.0"
+  }
+}
