@@ -47,7 +47,7 @@ echo "==> Build + test only this package (and its deps if needed)"
 # build first so dist exists for pack/publish
 pnpm --filter ./packages/markdown-it-dl-list... build
 # run tests only for this package if it has them
-pnpm --filter ./packages/markdown-it-dl-list test --if-present
+pnpm --filter ./packages/markdown-it-dl-list test
 
 # ---- pack preview ----
 echo "==> Pack preview (local tarball)"
