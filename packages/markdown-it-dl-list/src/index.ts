@@ -59,13 +59,10 @@ export default function dlListPlugin(md: MarkdownIt, opts: DlListOptions = {}) {
         return true;
     });
 
-    // Renderer rules
-    md.renderer.rules[T_DL_OPEN] = () => "<dl>\n";
-    md.renderer.rules[T_DL_CLOSE] = () => "</dl>\n";
-    md.renderer.rules[T_DT_OPEN] = () => "<dt>";
-    md.renderer.rules[T_DT_CLOSE] = () => "</dt>\n";
-    md.renderer.rules[T_DD_OPEN] = () => "<dd>";
-    md.renderer.rules[T_DD_CLOSE] = () => "</dd>\n";
+    // NOTE:
+    // We intentionally do NOT define renderer rules here.
+    // markdown-it will fall back to its default renderer,
+    // which simply calls `slf.renderToken(...)` for these tokens.
 }
 
 /**
