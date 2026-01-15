@@ -10,6 +10,20 @@ and this project follows [Semantic Versioning](https://semver.org/).
 
 ---
 
+## 0.1.1 - 2026-01-15
+
+### markdown-it-dl-list
+
+- Removed custom renderer rules and delegated rendering to the default `renderToken`,
+  enabling users to add custom attributes to rendered elements.
+- Fixed an issue where line number information (`token.map`) was not correctly
+  propagated when processing `<dd>` elements.
+
+### vscode-dl-list-preview
+
+- Hid the vertical guide line shown in the Markdown preview when placing the cursor
+  on `<dl>` elements.
+
 ## 0.1.0 - 2026-01-14
 
 ### Added

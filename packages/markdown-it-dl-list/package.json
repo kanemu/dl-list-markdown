@@ -1,6 +1,6 @@
 {
     "name": "markdown-it-dl-list",
-    "version": "0.1.0",
+    "version": "0.1.1",
     "description": "markdown-it plugin for colon-based definition lists (<dl>, <dt>, <dd>)",
     "license": "MIT",
     "type": "module",
