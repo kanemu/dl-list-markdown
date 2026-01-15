@@ -118,13 +118,11 @@ function renderDlTokens(state: any, begin: number, endLine: number, items: DlIte
         state.push(T_DT_CLOSE, "dt", -1);
 
         for (const d of it.dds) {
-            state.push(T_DD_OPEN, "dd", 1);
+            const ddOpen = state.push(T_DD_OPEN, "dd", 1) as any;
+            ddOpen.map = [d.line, d.line + 1]; // 暫定
 
-            // If dd looks like nested dl-list or multiline, block-parse it.
             if (shouldBlockParseDd(d.text)) {
-                const ddText = looksLikeNestedDl(d.text) ? normalizeNestedDlText(d.text) : d.text;
-                const normalized = normalizeIndentedBlock(ddText);
-                parseDdContentIntoTokens(state, normalized);
+                parseDdContentIntoTokens(state, d.text, d.line);
             } else {
                 pushInline(state, d.text, d.line);
             }
@@ -382,10 +380,19 @@ function normalizeIndentedBlock(text: string) {
  * Parse dd contents with markdown-it block parser, and unwrap a single paragraph
  * so `<dd>` doesn't become `<dd><p>...</p></dd>` for simple cases.
  */
-function parseDdContentIntoTokens(state: any, text: string) {
+function parseDdContentIntoTokens(state: any, text: string, line: number) {
+    const ddText = looksLikeNestedDl(text) ? normalizeNestedDlText(text) : text;
+    const normalized = normalizeIndentedBlock(ddText);
+
     const start = state.tokens.length;
-    state.md.block.parse(text, state.md, state.env, state.tokens);
+    state.md.block.parse(normalized, state.md, state.env, state.tokens);
     const added = state.tokens.slice(start);
+
+    for (const t of added) {
+        if (Array.isArray(t.map)) {
+            t.map = [t.map[0] + line, t.map[1] + line];
+        }
+    }
 
     if (
         added.length === 3 &&
@@ -393,7 +400,13 @@ function parseDdContentIntoTokens(state: any, text: string) {
         added[1]?.type === "inline" &&
         added[2]?.type === "paragraph_close"
     ) {
+        const pOpen = added[0];
+        const inline = added[1];
+
+        if (!Array.isArray(inline.map) && Array.isArray(pOpen.map)) {
+            inline.map = pOpen.map;
+        }
         state.tokens.length = start;
-        state.tokens.push(added[1]);
+        state.tokens.push(inline);
     }
 }
