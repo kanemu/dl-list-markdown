@@ -31,7 +31,7 @@ if ! git diff --quiet || ! git diff --cached --quiet; then
 fi
 
 echo "==> Ensure VS Code publisher is logged in"
-vsce whoami >/dev/null 2>&1 || die "Not logged in to vsce. Run: pnpm exec vsce login"
+vsce ls-publishers >/dev/null 2>&1 || die "Not logged in to vsce. Run: pnpm exec vsce login"
 
 # ---- build ----
 echo ""
