@@ -1,0 +1,11 @@
+.markdown-body > dl {
+    margin-left: 26px;
+}
+
+dt {
+    font-weight: bold;
+}
+
+dd {
+    margin-left: 26px;
+}
