@@ -283,6 +283,14 @@ function readDdBlock(state: any, startLine: number, endLine: number, baseIndent:
         lines.push(dd0.isNestedDlStart ? `: ${dd0.text}` : dd0.text);
     }
 
+    // If dd starts a nested dl (e.g. ": : Orin" -> dd text begins with ":"), then
+    // dd continuation may include further ":" lines that would otherwise look like
+    // "another dd". In that case, treat ":" lines deeper than minIndent as content,
+    // and stop only when a ":" line appears back at minIndent (sibling dd).
+    const startsNestedDl =
+        !!dd0 &&
+        (dd0.isNestedDlStart || dd0.text.replace(/^\s+/, "").indexOf(":") === 0);
+
     let line = startLine + 1;
 
     while (line < endLine) {
@@ -294,10 +302,16 @@ function readDdBlock(state: any, startLine: number, endLine: number, baseIndent:
             if (isWhitespaceOnlyLine(state, next)) break;
             if (parseDtLine(state, next)) break;
 
-            if (parseDdHeaderAtLevel(state, next, minIndent) || isEmptyDdHeaderAtLevel(state, next, minIndent)) break;
-
+            // If next line looks like a dd header, normally we would end this dd.
+            // But for nested-dl dd, allow deeper-indented ":" lines to continue.
             const rawNext = getLineText(state, next);
             const indentNext = countLeadingSpaces(rawNext);
+            const nextLooksLikeDd =
+                !!parseDdHeaderAtLevel(state, next, minIndent) || isEmptyDdHeaderAtLevel(state, next, minIndent);
+            if (nextLooksLikeDd) {
+                if (!(startsNestedDl && indentNext > minIndent)) break;
+            }
+
             if (!emptyHeader && indentNext < minIndent) break;
 
             lines.push("");
@@ -307,10 +321,17 @@ function readDdBlock(state: any, startLine: number, endLine: number, baseIndent:
 
         if (parseDtLine(state, line)) break;
 
-        if (parseDdHeaderAtLevel(state, line, minIndent) || isEmptyDdHeaderAtLevel(state, line, minIndent)) break;
-
+        // If this line looks like another dd header at the same "dd level":
+        // - normal dd: end current dd
+        // - nested-dl dd: treat deeper-indented ":" lines as content; only end when
+        //   we return to minIndent (sibling dd)
         const raw = getLineText(state, line);
         const indent = countLeadingSpaces(raw);
+        const looksLikeDdHere =
+            !!parseDdHeaderAtLevel(state, line, minIndent) || isEmptyDdHeaderAtLevel(state, line, minIndent);
+        if (looksLikeDdHere) {
+            if (!(startsNestedDl && indent > minIndent)) break;
+        }
 
         if (!emptyHeader && indent < minIndent) break;
 
@@ -353,11 +374,36 @@ function normalizeNestedDlText(text: string) {
     const lines = text.split("\n");
     if (lines.length <= 1) return text;
 
-    // Normalize ": ..." lines after the first line to 4-space indent so nested parsing is stable.
+    let dtShift = 0;
     for (let i = 1; i < lines.length; i++) {
-        const m = lines[i].match(/^(\s*):(.*)$/);
-        if (m) lines[i] = "    :" + m[2];
+        const l = lines[i];
+        if (l.trim().length === 0) continue;
+        const m = l.match(/^(\s{0,3}):/);
+        if (m) {
+            dtShift = countLeadingSpaces(m[1]); // 0..3
+            break;
+        }
     }
+
+    for (let i = 1; i < lines.length; i++) {
+        const l = lines[i];
+        if (l.trim().length === 0) {
+            lines[i] = "";
+            continue;
+        }
+
+        let shifted = l;
+        if (dtShift > 0) shifted = stripUpTo(shifted, dtShift);
+
+        const m2 = shifted.match(/^(\s*):(.*)$/);
+        if (m2) {
+            const indent = countLeadingSpaces(m2[1]);
+            if (indent >= 4) shifted = "    :" + m2[2];
+        }
+
+        lines[i] = shifted;
+    }
+
     return lines.join("\n");
 }
 

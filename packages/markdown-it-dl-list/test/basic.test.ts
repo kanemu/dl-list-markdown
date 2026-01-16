@@ -203,6 +203,49 @@ test('dl-list: dd can nest dl (":: apple" etc)', () => {
     equalOutput(render(md), html);
 })
 
+test('dl-list: dd can nest dl (more complex structure)', () => {
+    const md = `\
+: Apple
+    : : Orin
+          : The name comes from “king of apples”
+      : Fuji
+          : The apple variety that originated in Japan
+            and is the most produced around the world.
+      : Jonagold
+          : A popular variety created in America
+            by crossing Golden Delicious and Jonathan.
+    : There are many other varieties as well.
+: Grapes
+    : purple, clustered fruit
+: Melon
+    : covered in a green, hard skin
+`;
+    const html = `\
+<dl>
+    <dt>Apple</dt>
+    <dd>
+        <dl>
+            <dt>Orin</dt>
+            <dd>The name comes from “king of apples”</dd>
+            <dt>Fuji</dt>
+            <dd>The apple variety that originated in Japan
+and is the most produced around the world.</dd>
+            <dt>Jonagold</dt>
+            <dd>A popular variety created in America
+by crossing Golden Delicious and Jonathan.</dd>
+        </dl>
+    </dd>
+    <dd>There are many other varieties as well.</dd>
+    <dt>Grapes</dt>
+    <dd>purple, clustered fruit</dd>
+    <dt>Melon</dt>
+    <dd>covered in a green, hard skin</dd>
+</dl>
+`;
+
+    equalOutput(render(md), html);
+})
+
 test('dl-list: blank line ends dl-list; following paragraph remains', () => {
     const md = `\
 : term
