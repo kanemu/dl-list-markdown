@@ -13,7 +13,7 @@
 1. 番号付き
 2. 項目
 
-## 定義リスト
+## 3. 定義リスト
 
 : [りんご](https://ja.wikipedia.org/wiki/%E3%83%AA%E3%83%B3%E3%82%B4)
     : 赤くてまるい *果物*
@@ -22,15 +22,15 @@
 : [めろん](https://ja.wikipedia.org/wiki/%E3%83%A1%E3%83%AD%E3%83%B3)
     : 緑で固い皮に包まれている
 
-## 3. リンクと画像
+## 4. リンクと画像
 [CommonMark 公式](https://commonmark.org)  
 ![Logo](https://commonmark.org/help/images/favicon.png)
 
-## 4. 引用
+## 5. 引用
 > 引用文です。
 >> ネストした引用です。
 
-## 5. コード
+## 6. コード
 インラインで `code` を書く。
 
 ブロックでの記述：
@@ -39,8 +39,8 @@ const message = "Hello World";
 console.log(message);
 ```
 
-## 6. 水平線
+## 7. 水平線
 ---
 
-## 7. エスケープ
+## 8. エスケープ
 \* アスタリスクをそのまま表示する。
