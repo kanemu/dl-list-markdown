@@ -15,6 +15,12 @@ Pandoc などに見られる定義リスト構文に着想を得た、
 - 入れ子の定義リストをサポート
 - 標準的な markdown-it の処理フローに統合可能
 
+👉 **VS Code を利用している方へ:**
+VS Code の組み込み Markdown プレビューで `<dl>` 要素を正しく表示するには、
+以下の拡張機能を併せてインストールしてください。
+
+**[Definition List (dl, dt, dd) Preview](https://marketplace.visualstudio.com/items?itemName=kanemu-dev.vscode-dl-list-preview)**
+
 ## インストール
 
 ```bash
@@ -24,10 +30,10 @@ npm install markdown-it-dl-list
 ## 使い方
 
 ```js
-import MarkdownIt from "markdown-it";
+import markdownit from "markdown-it";
 import dlList from "markdown-it-dl-list";
 
-const md = new MarkdownIt();
+const md = markdownit();
 md.use(dlList);
 
 const src = `

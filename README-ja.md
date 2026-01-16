@@ -1,6 +1,6 @@
 # dl-list-markdown
 
-Markdown に **コロン記法の定義リスト（definition list）**を追加するための
+Markdown に **コロン記法の定義リスト（definition list）** を追加するための
 ツール群をまとめた **モノレポ**です。
 
 Pandoc などに見られる定義リスト構文に着想を得て、
@@ -33,7 +33,7 @@ Pandoc などに見られる定義リスト構文に着想を得て、
 * 複数定義、dt-only、複数行用語、入れ子構造をサポート
 * SSG やプレビューエンジンでの利用を想定
 
-📦 npm: `markdown-it-dl-list`
+📦 npm: [`markdown-it-dl-list`](https://www.npmjs.com/package/markdown-it-dl-list)
 📄 ドキュメント:
 [`packages/markdown-it-dl-list/README.md`](./packages/markdown-it-dl-list/README.md)
 [`packages/markdown-it-dl-list/README-ja.md`](./packages/markdown-it-dl-list/README-ja.md)
@@ -47,8 +47,7 @@ Pandoc などに見られる定義リスト構文に着想を得て、
 * プレビュー専用（エディタ動作や Markdown ソースは変更しない）
 * 設定によるインデント調整に対応
 
-🧩 VS Code Extension:
-**DL List Preview (colon-based)**
+🧩 VS Code Extension: [**DL List Preview (colon-based)**](https://marketplace.visualstudio.com/items?itemName=kanemu-dev.vscode-dl-list-preview)
 📄 ドキュメント:
 [`packages/vscode-dl-list-preview/README.md`](./packages/vscode-dl-list-preview/README.md)
 
@@ -95,7 +94,7 @@ pnpm --filter vscode-dl-list-preview build
 * 仕様を必要以上に広げない
 
 本プロジェクトは、
-**すべての定義リスト方言を網羅すること**を目的としていません。
+すべての定義リスト方言を網羅することを目的としていません。
 予測可能で保守しやすい仕様を優先しています。
 
 ---

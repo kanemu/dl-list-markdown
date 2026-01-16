@@ -15,6 +15,11 @@ Pandoc and other Markdown variants.
 - Nested definition lists
 - Designed to work with standard markdown-it pipelines
 
+👉 **VS Code users:**
+Use the companion extension
+**[Definition List (dl, dt, dd) Preview](https://marketplace.visualstudio.com/items?itemName=kanemu-dev.vscode-dl-list-preview)**  
+to get proper `<dl>` rendering in the built-in Markdown preview.
+
 ## Installation
 
 ```bash
@@ -24,10 +29,10 @@ npm install markdown-it-dl-list
 ## Usage
 
 ```js
-import MarkdownIt from "markdown-it";
+import markdownit from "markdown-it";
 import dlList from "markdown-it-dl-list";
 
-const md = new MarkdownIt();
+const md = markdownit();
 md.use(dlList);
 
 const src = `

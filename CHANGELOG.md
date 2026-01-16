@@ -10,6 +10,16 @@ and this project follows [Semantic Versioning](https://semver.org/).
 
 ---
 
+## 0.1.2 - 2026-01-16
+
+### markdown-it-dl-list
+
+- Fixed incorrect parsing of nested definition lists (dt/dd misclassification and indentation handling)
+
+### vscode-dl-list-preview
+
+- Added CSS styles for definition lists in the Markdown preview
+
 ## 0.1.1 - 2026-01-15
 
 ### markdown-it-dl-list

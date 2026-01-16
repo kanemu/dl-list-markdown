@@ -37,7 +37,7 @@ using `<dl>`, `<dt>`, and `<dd>`.
 * Supports multiple definitions, dt-only entries, multiline terms, and nesting
 * Intended for libraries, static site generators, and preview engines
 
-📦 npm: `markdown-it-dl-list`
+📦 npm: [`markdown-it-dl-list`](https://www.npmjs.com/package/markdown-it-dl-list)
 📄 Docs: [`packages/markdown-it-dl-list/README.md`](./packages/markdown-it-dl-list/README.md)
 
 ### `vscode-dl-list-preview`
@@ -49,7 +49,7 @@ built-in Markdown Preview.
 * Preview-only (does not modify editor behavior)
 * Lightweight and configuration-driven
 
-🧩 VS Code Extension: *DL List Preview (colon-based)*
+🧩 VS Code Extension: [**DL List Preview (colon-based)**](https://marketplace.visualstudio.com/items?itemName=kanemu-dev.vscode-dl-list-preview)
 📄 Docs: [`packages/vscode-dl-list-preview/README.md`](./packages/vscode-dl-list-preview/README.md)
 
 ## Repository structure
