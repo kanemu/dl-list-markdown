@@ -57,7 +57,7 @@ export default function dlListPlugin(md: MarkdownIt, opts: DlListOptions = {}) {
         const parsed = parseDlItems(state, begin, endLine, { ddIndent, requireDd, breakOnBlankLine });
         if (!parsed) return false;
 
-        renderDlTokens(state, begin, parsed.endLine, parsed.items);
+        renderDlTokens(state, begin, parsed.endLine, parsed.items, ddIndent);
         state.line = parsed.endLine;
         return true;
     });
@@ -116,7 +116,7 @@ function parseDlItems(
     return { items, endLine: line };
 }
 
-function renderDlTokens(state: any, begin: number, endLine: number, items: DlItem[]) {
+function renderDlTokens(state: any, begin: number, endLine: number, items: DlItem[], tabSize: number) {
     const dlOpen = state.push(T_DL_OPEN, "dl", 1);
     dlOpen.map = [begin, endLine];
 
@@ -132,7 +132,7 @@ function renderDlTokens(state: any, begin: number, endLine: number, items: DlIte
             ddOpen.map = [d.line, d.line + 1]; // 暫定
 
             if (shouldBlockParseDd(d.text)) {
-                parseDdContentIntoTokens(state, d.text, d.line);
+                parseDdContentIntoTokens(state, d.text, d.line, tabSize);
             } else {
                 pushInline(state, d.text, d.line);
             }
@@ -165,8 +165,8 @@ function hasDdHeaderAtSameLevel(state: any, dtBlock: DtBlock, ddIndent: number, 
     const minIndent = dtBlock.baseIndent + ddIndent;
     if (dtBlock.nextLine >= endLine) return false;
     return (
-        !!parseDdHeaderAtLevel(state, dtBlock.nextLine, minIndent) ||
-        isEmptyDdHeaderAtLevel(state, dtBlock.nextLine, minIndent)
+        !!parseDdHeaderAtLevel(state, dtBlock.nextLine, minIndent, ddIndent) ||
+        isEmptyDdHeaderAtLevel(state, dtBlock.nextLine, minIndent, ddIndent)
     );
 }
 
@@ -218,32 +218,47 @@ function parseDtLine(state: any, line: number): { text: string } | null {
  * Parse a dd header at the "same level" as a dt.
  * Allowed indentation: minIndent..minIndent+3
  */
-function parseDdHeaderAtLevel(state: any, line: number, minIndent: number): DdHeader | null {
+function parseDdHeaderAtLevel(state: any, line: number, minIndent: number, tabSize: number): DdHeader | null {
     if (line >= state.lineMax) return null;
     const raw = getLineText(state, line);
-    const indent = countLeadingSpaces(raw);
+    const { cols: indentCols, nextIndex } = countLeadingIndentCols(raw, tabSize);
 
-    if (indent < minIndent || indent > minIndent + 3) return null;
+    if (indentCols < minIndent || indentCols > minIndent + 3) return null;
 
-    // Accept both:
-    //   ":  text"  -> normal dd
-    //   ":: text"  -> dd that starts a nested dl (shorthand for ": : text")
-    const re = new RegExp(`^( {${indent}})(::?)[ \\t]+(.+?)\\s*$`);
-    const m = raw.match(re);
-    if (!m) return null;
-    const marker = m[2]; // ":" or "::"
-    return { text: m[3], isNestedDlStart: marker === "::" };
+    // After indent, must start with ":" or "::"
+    const a = raw.charCodeAt(nextIndex);
+    if (a !== 58 /* : */) return null;
+    const b = raw.charCodeAt(nextIndex + 1);
+    const isDouble = b === 58 /* : */;
+    const markerLen = isDouble ? 2 : 1;
+
+    // Require at least one space/tab after marker
+    const after = raw.charCodeAt(nextIndex + markerLen);
+    const isWs = after === 32 /* space */ || after === 9 /* tab */;
+    if (!isWs) return null;
+
+    const text = raw.slice(nextIndex + markerLen).trim();
+    if (text.length === 0) return null;
+
+    return { text, isNestedDlStart: isDouble };
 }
 
 /** True if line is a dd header `:` (no text) at same level (minIndent..minIndent+3). */
-function isEmptyDdHeaderAtLevel(state: any, line: number, minIndent: number) {
+function isEmptyDdHeaderAtLevel(state: any, line: number, minIndent: number, tabSize: number) {
     if (line >= state.lineMax) return false;
     const raw = getLineText(state, line);
-    const indent = countLeadingSpaces(raw);
-    if (indent < minIndent || indent > minIndent + 3) return false;
-    // Allow ":" or "::" with no text
-    const re = new RegExp(`^( {${indent}})(::?)\\s*$`);
-    return re.test(raw);
+    const { cols: indentCols, nextIndex } = countLeadingIndentCols(raw, tabSize);
+    if (indentCols < minIndent || indentCols > minIndent + 3) return false;
+
+    const a = raw.charCodeAt(nextIndex);
+    if (a !== 58 /* : */) return false;
+    const b = raw.charCodeAt(nextIndex + 1);
+    const isDouble = b === 58 /* : */;
+    const markerLen = isDouble ? 2 : 1;
+
+    // Allow trailing whitespace only
+    const rest = raw.slice(nextIndex + markerLen);
+    return rest.trim().length === 0;
 }
 
 /**
@@ -269,7 +284,10 @@ function readDtBlock(state: any, startLine: number, endLine: number, ddMinIndent
 
         // dd starts
         const minIndent = baseIndent + ddMinIndent;
-        if (parseDdHeaderAtLevel(state, line, minIndent) || isEmptyDdHeaderAtLevel(state, line, minIndent)) break;
+        if (
+            parseDdHeaderAtLevel(state, line, minIndent, ddMinIndent) ||
+            isEmptyDdHeaderAtLevel(state, line, minIndent, ddMinIndent)
+        ) break;
 
         // continuation line must start with space/tab
         const raw = getLineText(state, line);
@@ -293,8 +311,8 @@ function readDtBlock(state: any, startLine: number, endLine: number, ddMinIndent
 function readDdBlock(state: any, startLine: number, endLine: number, baseIndent: number, ddIndent: number): DdBlock | null {
     const minIndent = baseIndent + ddIndent;
 
-    const dd0 = parseDdHeaderAtLevel(state, startLine, minIndent);
-    const emptyHeader = !dd0 && isEmptyDdHeaderAtLevel(state, startLine, minIndent);
+    const dd0 = parseDdHeaderAtLevel(state, startLine, minIndent, ddIndent);
+    const emptyHeader = !dd0 && isEmptyDdHeaderAtLevel(state, startLine, minIndent, ddIndent);
     if (!dd0 && !emptyHeader) return null;
 
     const lines: string[] = [];
@@ -326,9 +344,10 @@ function readDdBlock(state: any, startLine: number, endLine: number, baseIndent:
             // If next line looks like a dd header, normally we would end this dd.
             // But for nested-dl dd, allow deeper-indented ":" lines to continue.
             const rawNext = getLineText(state, next);
-            const indentNext = countLeadingSpaces(rawNext);
+            const indentNext = countLeadingIndentCols(rawNext, ddIndent).cols;
             const nextLooksLikeDd =
-                !!parseDdHeaderAtLevel(state, next, minIndent) || isEmptyDdHeaderAtLevel(state, next, minIndent);
+                !!parseDdHeaderAtLevel(state, next, minIndent, ddIndent) ||
+                isEmptyDdHeaderAtLevel(state, next, minIndent, ddIndent);
             if (nextLooksLikeDd) {
                 if (!(startsNestedDl && indentNext > minIndent)) break;
             }
@@ -347,17 +366,18 @@ function readDdBlock(state: any, startLine: number, endLine: number, baseIndent:
         // - nested-dl dd: treat deeper-indented ":" lines as content; only end when
         //   we return to minIndent (sibling dd)
         const raw = getLineText(state, line);
-        const indent = countLeadingSpaces(raw);
+        const indent = countLeadingIndentCols(raw, ddIndent).cols;
         const looksLikeDdHere =
-            !!parseDdHeaderAtLevel(state, line, minIndent) || isEmptyDdHeaderAtLevel(state, line, minIndent);
+            !!parseDdHeaderAtLevel(state, line, minIndent, ddIndent) ||
+            isEmptyDdHeaderAtLevel(state, line, minIndent, ddIndent);
         if (looksLikeDdHere) {
             if (!(startsNestedDl && indent > minIndent)) break;
         }
 
         if (!emptyHeader && indent < minIndent) break;
 
-        const cut = emptyHeader ? Math.min(indent, minIndent) : minIndent;
-        lines.push(stripUpTo(raw, cut).replace(/\s+$/, ""));
+        const cutCols = emptyHeader ? Math.min(indent, minIndent) : minIndent;
+        lines.push(stripUpToIndentCols(raw, cutCols, ddIndent).replace(/\s+$/, ""));
         line++;
     }
 
@@ -380,9 +400,58 @@ function countLeadingSpaces(s: string) {
     return i;
 }
 
+/**
+ * Count leading indent in *columns*.
+ * - space = 1 col
+ * - tab = tabSize cols (tabSize == ddIndent per plugin rule)
+ */
+function countLeadingIndentCols(s: string, tabSize: number): { cols: number; nextIndex: number } {
+    let cols = 0;
+    let i = 0;
+    while (i < s.length) {
+        const c = s.charCodeAt(i);
+        if (c === 32 /* space */) {
+            cols += 1;
+            i++;
+            continue;
+        }
+        if (c === 9 /* tab */) {
+            cols += tabSize;
+            i++;
+            continue;
+        }
+        break;
+    }
+    return { cols, nextIndex: i };
+}
+
 function stripUpTo(s: string, n: number) {
     let i = 0;
     while (i < s.length && i < n && s.charCodeAt(i) === 32) i++;
+    return s.slice(i);
+}
+
+/**
+ * Strip leading indent up to `nCols` columns (space=1, tab=tabSize).
+ * If a tab would overshoot remaining cols, we still strip that tab (consistent with "tab counts as tabSize").
+ */
+function stripUpToIndentCols(s: string, nCols: number, tabSize: number) {
+    let cols = 0;
+    let i = 0;
+    while (i < s.length && cols < nCols) {
+        const c = s.charCodeAt(i);
+        if (c === 32 /* space */) {
+            cols += 1;
+            i++;
+            continue;
+        }
+        if (c === 9 /* tab */) {
+            cols += tabSize;
+            i++;
+            continue;
+        }
+        break;
+    }
     return s.slice(i);
 }
 
@@ -399,7 +468,8 @@ function normalizeNestedDlText(text: string) {
     for (let i = 1; i < lines.length; i++) {
         const l = lines[i];
         if (l.trim().length === 0) continue;
-        const m = l.match(/^(\s{0,3}):/);
+        // (Keep it simple: treat leading tabs as 0 here; nested dl normalization is best-effort.)
+        const m = l.match(/^( {0,3}):/);
         if (m) {
             dtShift = countLeadingSpaces(m[1]); // 0..3
             break;
@@ -428,28 +498,31 @@ function normalizeNestedDlText(text: string) {
     return lines.join("\n");
 }
 
-function normalizeIndentedBlock(text: string) {
+function normalizeIndentedBlock(text: string, tabSize: number) {
     const lines = text.split("\n");
 
     // Compute minimum indent of non-empty lines and strip it.
     let min = Infinity;
     for (const l of lines) {
         if (l.trim().length === 0) continue;
-        const n = countLeadingSpaces(l);
+        // Use ddIndent-as-tabSize rule (default 4) when normalizing blocks too.
+        const n = countLeadingIndentCols(l, tabSize).cols;
         if (n < min) min = n;
     }
     if (!isFinite(min) || min === 0) return text;
 
-    return lines.map((l) => (l.trim().length === 0 ? "" : stripUpTo(l, min))).join("\n");
+    return lines
+        .map((l) => (l.trim().length === 0 ? "" : stripUpToIndentCols(l, min, tabSize)))
+        .join("\n");
 }
 
 /**
  * Parse dd contents with markdown-it block parser, and unwrap a single paragraph
  * so `<dd>` doesn't become `<dd><p>...</p></dd>` for simple cases.
  */
-function parseDdContentIntoTokens(state: any, text: string, line: number) {
+function parseDdContentIntoTokens(state: any, text: string, line: number, tabSize: number) {
     const ddText = looksLikeNestedDl(text) ? normalizeNestedDlText(text) : text;
-    const normalized = normalizeIndentedBlock(ddText);
+    const normalized = normalizeIndentedBlock(ddText, tabSize);
 
     const start = state.tokens.length;
     state.md.block.parse(normalized, state.md, state.env, state.tokens);

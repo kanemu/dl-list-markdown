@@ -62,6 +62,20 @@ test('dl-list: consecutive dt before a dd', () => {
     equalOutput(render(md), html)
 })
 
+test('dl-list: dd indented with a tab (tab == ddIndent)', () => {
+    const md = `\
+: term1
+\t: desc
+`;
+    const html = `\
+<dl>
+    <dt>term1</dt>
+    <dd>desc</dd>
+</dl>
+`;
+    equalOutput(render(md), html)
+})
+
 test('dl-list: multiple items (dt resets item)', () => {
     const md = `\
 : term1
