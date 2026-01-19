@@ -30,14 +30,6 @@ lib/
 dist/
 coverage/
 
-# ---------------------------------------------------------
-# EXCEPTIONS
-# ---------------------------------------------------------
-# micromark-extension-dl-list is written in JS
-# its lib/ directory contains source files and must be kept
-!packages/micromark-extension-dl-list/lib/
-!packages/micromark-extension-dl-list/lib/**
-
 # =========================================================
 # TypeScript / tooling caches
 # =========================================================

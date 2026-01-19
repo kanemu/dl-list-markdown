@@ -10,6 +10,14 @@ and this project follows [Semantic Versioning](https://semver.org/).
 
 ---
 
+## 0.1.3 - 2026-01-19
+
+### markdown-it-dl-list
+
+- Added support for indentation using tabs
+  - Tabs are treated as 4 spaces by default (configurable via the `ddIndent` option)
+- Fixed an issue where consecutive `dt` lines before a `dd` were not converted correctly
+
 ## 0.1.2 - 2026-01-16
 
 ### markdown-it-dl-list

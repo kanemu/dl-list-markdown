@@ -17,7 +17,7 @@ Pandoc and other Markdown variants.
 
 👉 **VS Code users:**
 Use the companion extension
-**[Definition List (dl, dt, dd) Preview](https://marketplace.visualstudio.com/items?itemName=kanemu-dev.vscode-dl-list-preview)**  
+**[DL List Preview (colon-based)](https://marketplace.visualstudio.com/items?itemName=kanemu-dev.vscode-dl-list-preview)**  
 to get proper `<dl>` rendering in the built-in Markdown preview.
 
 ## Installation
@@ -130,6 +130,11 @@ md.use(dlList, {
 * Does not modify Markdown rendering outside definition lists
 * Does not change markdown-it default paragraph behavior
 * Does not attempt to support every existing definition list syntax variant
+
+## Related projects
+
+- [`remark-dl-list`](https://www.npmjs.com/package/remark-dl-list)
+  A remark plugin that adds the same colon-based definition list syntax to unified / remark pipelines.
 
 ## License
 

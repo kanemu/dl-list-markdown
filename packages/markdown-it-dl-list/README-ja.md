@@ -19,7 +19,7 @@ Pandoc などに見られる定義リスト構文に着想を得た、
 VS Code の組み込み Markdown プレビューで `<dl>` 要素を正しく表示するには、
 以下の拡張機能を併せてインストールしてください。
 
-**[Definition List (dl, dt, dd) Preview](https://marketplace.visualstudio.com/items?itemName=kanemu-dev.vscode-dl-list-preview)**
+**[DL List Preview (colon-based)](https://marketplace.visualstudio.com/items?itemName=kanemu-dev.vscode-dl-list-preview)**
 
 ## インストール
 
@@ -133,6 +133,13 @@ md.use(dlList, {
 * 定義リスト以外の Markdown の挙動は変更しません
 * markdown-it の標準的な段落処理は維持されます
 * すべての既存定義リスト構文を網羅することは目的としていません
+
+A remark plugin that adds the same colon-based definition list syntax to unified / remark pipelines.
+
+## 関連プロジェクト
+
+- [`remark-dl-list`](https://www.npmjs.com/package/remark-dl-list)
+  unified / remark パイプライン向けに、同じコロン記法の説明リスト構文を追加する remark プラグインです。
 
 ## ライセンス
 
