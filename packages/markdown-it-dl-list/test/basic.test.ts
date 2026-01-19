@@ -326,6 +326,29 @@ test("dl-list: in blockquate", () => {
     equalOutput(render(md), html);
 })
 
+test('dl-list: dd can nest ul', () => {
+    const md = `\
+: fruits
+    : - apple
+      - grape
+      - orange
+`;
+    const html = `\
+<dl>
+  <dt>fruits</dt>
+  <dd>
+    <ul>
+      <li>apple</li>
+      <li>grape</li>
+      <li>orange</li>
+    </ul>
+  </dd>
+</dl>
+`;
+
+    equalOutput(render(md), html);
+})
+
 test("dl-list: with headings, paragraphs, and blockquotes", () => {
     const md = `\
 # title

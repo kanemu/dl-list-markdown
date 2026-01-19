@@ -189,6 +189,29 @@ function shouldBlockParseDd(text: string) {
     return looksLikeNestedDl(text) || text.indexOf("\n") >= 0;
 }
 
+function isListItemStart(text: string) {
+    // No leading spaces assumed for "start" (we’ll check exact "two-space offset" separately)
+    // Unordered: - * +
+    if (text.indexOf("- ") === 0 || text.indexOf("* ") === 0 || text.indexOf("+ ") === 0) return true;
+
+    // Ordered: "1. " "2) " etc
+    // Keep it simple and strict enough:
+    // - digits + "." or ")"
+    // - at least one space after
+    return /^[0-9]{1,9}[.)]\s+/.test(text);
+}
+
+function isTwoSpaceOffsetListItem(text: string) {
+    // The common case produced by current stripping:
+    // "  - item", "  * item", "  1. item", "  2) item"
+    if (text.indexOf("  ") !== 0) return false;
+    return isListItemStart(text.slice(2));
+}
+
+function stripTwoLeadingSpaces(text: string) {
+    return text.indexOf("  ") === 0 ? text.slice(2) : text;
+}
+
 function looksLikeNestedDl(text: string) {
     return text.replace(/^\s+/, "").indexOf(":") === 0;
 }
@@ -322,6 +345,10 @@ function readDdBlock(state: any, startLine: number, endLine: number, baseIndent:
         lines.push(dd0.isNestedDlStart ? `: ${dd0.text}` : dd0.text);
     }
 
+    // If the first dd line starts with a list marker, subsequent lines often need
+    // an extra 2-space compensation (because ": " consumes 2 columns on the header line).
+    const ddStartsWithList = !!dd0 && !dd0.isNestedDlStart && isListItemStart(dd0.text);
+
     // If dd starts a nested dl (e.g. ": : Orin" -> dd text begins with ":"), then
     // dd continuation may include further ":" lines that would otherwise look like
     // "another dd". In that case, treat ":" lines deeper than minIndent as content,
@@ -377,7 +404,14 @@ function readDdBlock(state: any, startLine: number, endLine: number, baseIndent:
         if (!emptyHeader && indent < minIndent) break;
 
         const cutCols = emptyHeader ? Math.min(indent, minIndent) : minIndent;
-        lines.push(stripUpToIndentCols(raw, cutCols, ddIndent).replace(/\s+$/, ""));
+        let out = stripUpToIndentCols(raw, cutCols, ddIndent).replace(/\s+$/, "");
+
+        // Compensation for list items inside dd:
+        // If dd header starts with "- item" (col 0), but continuation lines become "  - item",
+        // unindent those 2 spaces so markdown-it doesn't treat them as a nested list.
+        if (ddStartsWithList && isTwoSpaceOffsetListItem(out)) out = stripTwoLeadingSpaces(out);
+
+        lines.push(out);
         line++;
     }
 
