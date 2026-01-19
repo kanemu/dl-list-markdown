@@ -10,6 +10,12 @@ and this project follows [Semantic Versioning](https://semver.org/).
 
 ---
 
+## 0.1.4 - 2026-01-19
+
+### markdown-it-dl-list
+
+- Fixed incorrect indentation of block-level content inside `dd` elements
+
 ## 0.1.3 - 2026-01-19
 
 ### markdown-it-dl-list
