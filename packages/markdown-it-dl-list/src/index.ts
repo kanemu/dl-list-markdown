@@ -46,7 +46,10 @@ export default function dlListPlugin(md: MarkdownIt, opts: DlListOptions = {}) {
 
         // If dd is required, we only accept dt-only when followed by blank line or EOF.
         const firstHasDd = hasDdHeaderAtSameLevel(state, firstDt, ddIndent, endLine);
-        const firstDtOnlyOk = !firstHasDd && isDtOnlyBoundary(state, firstDt.nextLine, endLine);
+        const firstDtOnlyOk =
+            !firstHasDd &&
+            (isDtOnlyBoundary(state, firstDt.nextLine, endLine) ||
+                isNextLineAnotherDt(state, firstDt.nextLine, endLine));
         if (requireDd && !firstHasDd && !firstDtOnlyOk) return false;
 
         if (silent) return true;
@@ -88,12 +91,19 @@ function parseDlItems(
         if (dds.length === 0) {
             const afterDt = dtBlock.nextLine;
             const dtOnlyHere = isDtOnlyBoundary(state, afterDt, endLine);
+            const followedByDt = isNextLineAnotherDt(state, afterDt, endLine);
 
-            if (ctx.requireDd && !dtOnlyHere) break;
+            // Allow consecutive dt lines (multiple terms) before a dd appears:
+            //   : Apple
+            //   : Grapes
+            //       : purple...
+            // In this case, "Apple" is a term without dd, but it's still part of the same dl.
+            if (ctx.requireDd && !dtOnlyHere && !followedByDt) break;
 
             items.push({ dtLine: line, dtText: dtBlock.text, dds: [] });
             line = afterDt;
-            break; // dt-only ends the dl block by design in this implementation
+            if (followedByDt) continue; // keep consuming dt's until we meet dd / blank / EOF
+            break; // dt-only ends the dl block at boundary (blank/EOF) by design
         }
 
         items.push({ dtLine: line, dtText: dtBlock.text, dds });
@@ -162,6 +172,17 @@ function hasDdHeaderAtSameLevel(state: any, dtBlock: DtBlock, ddIndent: number, 
 
 function isDtOnlyBoundary(state: any, line: number, endLine: number) {
     return line >= endLine || isBlankLine(state, line);
+}
+
+/**
+ * True if the next line starts another dt (same dl level).
+ * This enables multiple <dt> in a row before a <dd>.
+ */
+function isNextLineAnotherDt(state: any, line: number, endLine: number) {
+    if (line >= endLine) return false;
+    if (isBlankLine(state, line)) return false;
+    // dt header is `: text` with up to 3 leading spaces
+    return !!parseDtLine(state, line);
 }
 
 function shouldBlockParseDd(text: string) {
