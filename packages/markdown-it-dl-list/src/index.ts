@@ -501,17 +501,19 @@ function normalizeNestedDlText(text: string) {
     let dtShift = 0;
     for (let i = 1; i < lines.length; i++) {
         const l = lines[i];
+        if (l === undefined) continue;
         if (l.trim().length === 0) continue;
         // (Keep it simple: treat leading tabs as 0 here; nested dl normalization is best-effort.)
         const m = l.match(/^( {0,3}):/);
         if (m) {
-            dtShift = countLeadingSpaces(m[1]); // 0..3
+            dtShift = countLeadingSpaces(m[1] ?? ""); // 0..3
             break;
         }
     }
 
     for (let i = 1; i < lines.length; i++) {
         const l = lines[i];
+        if (l === undefined) continue;
         if (l.trim().length === 0) {
             lines[i] = "";
             continue;
@@ -522,7 +524,7 @@ function normalizeNestedDlText(text: string) {
 
         const m2 = shifted.match(/^(\s*):(.*)$/);
         if (m2) {
-            const indent = countLeadingSpaces(m2[1]);
+            const indent = countLeadingSpaces(m2[1] ?? "");
             if (indent >= 4) shifted = "    :" + m2[2];
         }
 
