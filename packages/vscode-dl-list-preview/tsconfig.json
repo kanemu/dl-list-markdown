@@ -1,13 +1,25 @@
 {
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
-    "module": "commonjs",
-    "outDir": "dist",
-    "rootDir": "src",
+    /* VS Code extension host is Node.js */
+    "types": ["node", "vscode"],
+
+    /* Many extensions still ship CommonJS at runtime.
+       If you bundle (tsup/esbuild), you can keep module ESNext here. */
+    "module": "ESNext",
+    "target": "ES2018",
+    "lib": ["ES2018"],
+
+    /* VS Code APIs use Node-style resolution well; Bundler is also OK.
+       If you ever hit resolution issues with vscode.d.ts, switch to "NodeNext". */
+    "moduleResolution": "Bundler",
+
+    /* Recommended for extensions: keep sourcemaps */
     "sourceMap": true,
-    "esModuleInterop": true,
-    "allowSyntheticDefaultImports": true,
-    "skipLibCheck": true
+
+    /* tsc for type-check only */
+    "noEmit": true
   },
-  "include": ["src"]
+  "include": ["src/**/*.ts"],
+  "exclude": ["dist", "out", "node_modules"]
 }
