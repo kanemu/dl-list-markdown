@@ -5,7 +5,6 @@
     "version": "0.1.4",
     "icon": "icon.png",
     "publisher": "kanemu-dev",
-    "private": true,
     "repository": {
         "type": "git",
         "url": "https://github.com/kanemu/dl-list-markdown.git",
@@ -27,7 +26,9 @@
         "dl",
         "preview"
     ],
-    "activationEvents": [],
+    "activationEvents": [
+        "onLanguage:markdown"
+    ],
     "main": "./dist/extension.js",
     "contributes": {
         "markdown.previewStyles": [

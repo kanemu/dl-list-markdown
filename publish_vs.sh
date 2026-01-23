@@ -50,7 +50,19 @@ fi
 # ---- package ----
 echo ""
 echo "==> Package VSIX"
+echo ""
+echo "==> Package VSIX"
+jq '
+  .dependencies |= with_entries(
+    if (.value | startswith("workspace:"))
+    then .value |= sub("^workspace:"; "")
+    else .
+    end
+  )
+' ./packages/vscode-dl-list-preview/package.json > ./package.vs.json
+mv ./package.vs.json ./packages/vscode-dl-list-preview/package.json
 pnpm --filter vscode-dl-list-preview package
+git checkout -- ./packages/vscode-dl-list-preview/package.json
 
 VSIX_FILE="$(ls "$PKG_DIR"/*.vsix | tail -n 1)"
 test -f "$VSIX_FILE" || die "VSIX file not found"
