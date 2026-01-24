@@ -1,5 +1,7 @@
 # markdown-it-dl-list
 
+> 📕 **English version** → [README.md](./README.md)
+
 `<dl>`, `<dt>`, `<dd>` を使った
 **コロン記法の定義リスト**をサポートする **markdown-it プラグイン**です。
 
@@ -103,6 +105,13 @@ console.log(md.render(src));
           : 内側の説明文
     : 次の説明文
 ```
+
+定義リストの詳細な書式については、
+→ **[定義リスト構文仕様（unified / remark）](https://github.com/kanemu/unified-dl-list/blob/main/docs/syntax-ja.md)** を参照してください。
+
+※ このドキュメントは構文仕様のみを扱っています。
+エディタプレビューなど、markdown-it 固有の挙動については
+本パッケージの README を参照してください。
 
 ## オプション
 

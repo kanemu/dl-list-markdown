@@ -1,5 +1,7 @@
 # markdown-it-dl-list
 
+> 📘 **日本語版はこちら** → [README-ja.md](./README-ja.md)
+
 A **markdown-it plugin** that adds support for **colon-based definition lists**
 using `<dl>`, `<dt>`, and `<dd>`.
 
@@ -100,6 +102,13 @@ Indented lines following a term are treated as part of the term:
           : Inner definition
     : Next definition
 ```
+
+For the detailed definition list syntax,
+→ **[Definition List Syntax (unified / remark)](https://github.com/kanemu/unified-dl-list/blob/main/docs/syntax.md)**.
+
+Note that this document describes the syntax only.
+Implementation-specific behavior (such as editor preview integration)
+is documented in this package.
 
 ## Options
 
