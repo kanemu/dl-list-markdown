@@ -32,7 +32,7 @@ const DEFAULT_DD_INDENT = 4;
 const DEFAULT_REQUIRE_DD = true;
 const DEFAULT_BREAK_ON_BLANK = true;
 
-export default function dlListPlugin(md: MarkdownIt, opts: DlListOptions = {}) {
+export function markdownItDlList(md: MarkdownIt, opts: DlListOptions = {}) {
     const ddIndent = clampInt(opts.ddIndent ?? DEFAULT_DD_INDENT, 1, 12);
     const requireDd = opts.requireDd ?? DEFAULT_REQUIRE_DD;
     const breakOnBlankLine = opts.breakOnBlankLine ?? DEFAULT_BREAK_ON_BLANK;
@@ -586,3 +586,5 @@ function parseDdContentIntoTokens(state: any, text: string, line: number, tabSiz
         state.tokens.push(inline);
     }
 }
+
+export default markdownItDlList
