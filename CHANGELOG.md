@@ -10,6 +10,12 @@ and this project follows [Semantic Versioning](https://semver.org/).
 
 ---
 
+## 0.1.5 - 2026-01-26
+
+### markdown-it-dl-list
+
+- Add a named export `markdownItDlList` alongside the default export.
+
 ## 0.1.4 - 2026-01-19
 
 ### markdown-it-dl-list
