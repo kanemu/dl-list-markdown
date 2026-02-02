@@ -42,7 +42,7 @@ importers:
   packages/vscode-dl-list-preview:
     dependencies:
       markdown-it-dl-list:
-        specifier: workspace:^0.1.5
+        specifier: workspace:^0.1.6
         version: link:../markdown-it-dl-list
     devDependencies:
       '@types/node':

@@ -10,6 +10,16 @@ and this project follows [Semantic Versioning](https://semver.org/).
 
 ---
 
+## 0.1.6 - 2026-02-02
+
+### markdown-it-dl-list
+
+**⚠️ Breaking changes**
+
+- Removed support for the `::` shorthand inside definition descriptions (`dd`) for starting nested definition lists, **to avoid conflicts with other Markdown syntaxes**.
+- Nested definition lists must now be written using the standard syntax with `:` followed by whitespace.
+- `::` without whitespace is no longer treated as a definition list marker and is parsed as plain text.
+
 ## 0.1.5 - 2026-01-26
 
 ### markdown-it-dl-list
