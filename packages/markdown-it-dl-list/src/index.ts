@@ -16,7 +16,7 @@ type DlItem = { dtLine: number; dtText: string; dds: Array<{ line: number; text:
 
 type DtBlock = { baseIndent: number; text: string; nextLine: number };
 type DdBlock = { text: string; nextLine: number };
-type DdHeader = { text: string; isNestedDlStart: boolean };
+type DdHeader = { text: string };
 
 const RULE_NAME = "dl_list_colon";
 
@@ -248,12 +248,10 @@ function parseDdHeaderAtLevel(state: any, line: number, minIndent: number, tabSi
 
     if (indentCols < minIndent || indentCols > minIndent + 3) return null;
 
-    // After indent, must start with ":" or "::"
+    // After indent, must start with ":"
     const a = raw.charCodeAt(nextIndex);
     if (a !== 58 /* : */) return null;
-    const b = raw.charCodeAt(nextIndex + 1);
-    const isDouble = b === 58 /* : */;
-    const markerLen = isDouble ? 2 : 1;
+    const markerLen = 1;
 
     // Require at least one space/tab after marker
     const after = raw.charCodeAt(nextIndex + markerLen);
@@ -263,7 +261,7 @@ function parseDdHeaderAtLevel(state: any, line: number, minIndent: number, tabSi
     const text = raw.slice(nextIndex + markerLen).trim();
     if (text.length === 0) return null;
 
-    return { text, isNestedDlStart: isDouble };
+    return { text };
 }
 
 /** True if line is a dd header `:` (no text) at same level (minIndent..minIndent+3). */
@@ -275,9 +273,7 @@ function isEmptyDdHeaderAtLevel(state: any, line: number, minIndent: number, tab
 
     const a = raw.charCodeAt(nextIndex);
     if (a !== 58 /* : */) return false;
-    const b = raw.charCodeAt(nextIndex + 1);
-    const isDouble = b === 58 /* : */;
-    const markerLen = isDouble ? 2 : 1;
+    const markerLen = 1;
 
     // Allow trailing whitespace only
     const rest = raw.slice(nextIndex + markerLen);
@@ -340,22 +336,18 @@ function readDdBlock(state: any, startLine: number, endLine: number, baseIndent:
 
     const lines: string[] = [];
     if (dd0) {
-        // ":: apple" is shorthand for a nested dl start, so convert it to ": apple"
-        // inside dd text. Existing nested-dl detection will then work.
-        lines.push(dd0.isNestedDlStart ? `: ${dd0.text}` : dd0.text);
+        lines.push(dd0.text);
     }
 
     // If the first dd line starts with a list marker, subsequent lines often need
     // an extra 2-space compensation (because ": " consumes 2 columns on the header line).
-    const ddStartsWithList = !!dd0 && !dd0.isNestedDlStart && isListItemStart(dd0.text);
+    const ddStartsWithList = !!dd0 && isListItemStart(dd0.text);
 
     // If dd starts a nested dl (e.g. ": : Orin" -> dd text begins with ":"), then
     // dd continuation may include further ":" lines that would otherwise look like
     // "another dd". In that case, treat ":" lines deeper than minIndent as content,
     // and stop only when a ":" line appears back at minIndent (sibling dd).
-    const startsNestedDl =
-        !!dd0 &&
-        (dd0.isNestedDlStart || dd0.text.replace(/^\s+/, "").indexOf(":") === 0);
+    const startsNestedDl = !!dd0 && dd0.text.replace(/^\s+/, "").indexOf(":") === 0;
 
     let line = startLine + 1;
 
