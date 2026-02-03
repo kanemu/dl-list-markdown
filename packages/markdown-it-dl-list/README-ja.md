@@ -1,7 +1,5 @@
 # markdown-it-dl-list
 
-> 📕 **English version** → [README.md](./README.md)
-
 `<dl>`, `<dt>`, `<dd>` を使った
 **コロン記法の定義リスト**をサポートする **markdown-it プラグイン**です。
 

@@ -1,7 +1,5 @@
 # markdown-it-dl-list
 
-> 📘 **日本語版はこちら** → [README-ja.md](./README-ja.md)
-
 A **markdown-it plugin** that adds support for **colon-based definition lists**
 using `<dl>`, `<dt>`, and `<dd>`.
 

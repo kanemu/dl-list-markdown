@@ -1,5 +1,7 @@
 # dl-list-markdown
 
+> 📕 **English version** → [README.md](./README.md)
+
 Markdown に **コロン記法の定義リスト（definition list）** を追加するための
 ツール群をまとめた **モノレポ**です。
 

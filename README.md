@@ -1,5 +1,7 @@
 # dl-list-markdown
 
+> 📘 **日本語版はこちら** → [README-ja.md](./README-ja.md)
+
 A monorepo for **colon-based definition list** support across Markdown tooling.
 
 This project provides:
